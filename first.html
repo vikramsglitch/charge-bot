@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHARGE BOT - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #d1fae5;
+            --secondary: #0ea5e9;
+            --secondary-dark: #0284c7;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body.light-theme {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #d1fae5;
+            --secondary: #0284c7;
+            --secondary-dark: #0258a8;
+            --dark-bg: #f8fafc;
+            --dark-card: #f1f5f9;
+            --text-light: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --success: #059669;
+            --error: #dc2626;
+            --warning: #d97706;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2332 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        body.light-theme {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #e2e8f0 100%);
+        }
+
+        /* ===== AUTHENTICATION PAGE ===== */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: var(--dark-card);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideInUp 0.6s ease-out;
+            transition: all 0.4s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            background: var(--dark-bg);
+            color: var(--text-light);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .option-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .option-btn.active {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--primary);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ===== CAPTCHA ===== */
+        .captcha-container {
+            background: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 22px;
+            transition: all 0.4s ease;
+        }
+
+        .captcha-box {
+            background: linear-gradient(135deg, var(--dark-card), var(--dark-bg));
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: var(--primary);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .captcha-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,.03) 2px, rgba(255,255,255,.03) 4px);
+            pointer-events: none;
+        }
+
+        .captcha-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background: var(--dark-bg);
+            color: var(--text-light);
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+        }
+
+        .refresh-captcha {
+            width: 100%;
+            padding: 8px;
+            margin-top: 8px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-captcha:hover {
+            border-color: var(--secondary);
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--error);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            transition: all 0.4s ease;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: slideInUp 0.3s ease;
+        }
+
+        /* ===== MAIN APP ===== */
+        .app-container {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a2332 100%);
+            transition: background 0.4s ease;
+        }
+
+        .app-container.light-theme {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #e2e8f0 100%);
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+            border-bottom: 2px solid var(--border-color);
+            padding: 0 30px;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .app-container.light-theme .header {
+            background: linear-gradient(135deg, rgba(241, 245, 249, 0.95), rgba(226, 232, 240, 0.95));
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+        }
+
+        .header-title {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-detail {
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .user-detail .name {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .user-detail .role {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--error);
+            color: #fca5a5;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            background: var(--dark-card);
+            border-bottom: 2px solid var(--border-color);
+            padding: 0 30px;
+            gap: 10px;
+            transition: all 0.4s ease;
+        }
+
+        .tab-btn {
+            padding: 18px 30px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-light);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* ===== CONTENT AREA ===== */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            transition: all 0.4s ease;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== CLIENT SECTION - CHAT ===== */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .chat-header {
+            background: var(--dark-card);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.4s ease;
+        }
+
+        .chat-header h3 {
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .chat-header p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .faq-quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .faq-btn {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .faq-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .chat-messages {
+            flex: 1;
+            background: var(--dark-card);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.4s ease;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideInUp 0.3s ease;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: all 0.4s ease;
+        }
+
+        .message.bot .message-content {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--text-light);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--dark-card);
+            border: 2px solid var(--border-color);
+            padding: 14px 16px;
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ===== CHARGING HISTORY ===== */
+        .history-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .history-card:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(14, 165, 233, 0.15));
+        }
+
+        .history-card-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .history-card-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .history-card-detail span {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ===== EXECUTIVE SECTION ===== */
+        .executive-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .exec-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .exec-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .upload-area {
+            background: var(--dark-card);
+            border: 2px dashed var(--primary);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: var(--secondary);
+            background: rgba(14, 165, 233, 0.05);
+        }
+
+        .upload-area.drag-over {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--primary);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .upload-text strong {
+            color: var(--primary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            aspect-ratio: 1;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-inputs {
+            background: var(--dark-card);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.4s ease;
+        }
+
+        .form-inputs input,
+        .form-inputs select,
+        .form-inputs textarea {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.4s ease;
+        }
+
+        .form-inputs textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-inputs input:focus,
+        .form-inputs select:focus,
+        .form-inputs textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        /* ===== OWNER/ADMIN DASHBOARD ===== */
+        .owner-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .users-table thead {
+            background: rgba(16, 185, 129, 0.1);
+            border-bottom: 2px solid var(--border-color);
+            transition: all 0.4s ease;
+        }
+
+        .users-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .users-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            transition: all 0.4s ease;
+        }
+
+        .users-table tbody tr:hover {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .view-btn {
+            background: rgba(14, 165, 233, 0.2);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            background: rgba(14, 165, 233, 0.3);
+        }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--dark-card);
+            border: 2px solid var(--border-color);
+            padding: 16px 24px;
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideInUp 0.3s ease;
+            transition: all 0.4s ease;
+        }
+
+        .toast.success {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+            color: #86efac;
+        }
+
+        .toast.error {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .executive-container {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .message-content {
+                max-width: 90%;
+            }
+
+            .faq-quick-buttons {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 20px;
+                height: auto;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .header-controls {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .tabs {
+                padding: 0 20px;
+            }
+
+            .tab-btn {
+                padding: 15px 20px;
+            }
+
+            .content {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .auth-box {
+                padding: 30px 20px;
+            }
+
+            .faq-quick-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .message-content {
+                max-width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .users-table {
+                font-size: 11px;
+            }
+
+            .users-table th,
+            .users-table td {
+                padding: 10px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== AUTHENTICATION PAGE ===== -->
+    <div class="auth-container" id="authPage">
+        <div class="auth-box">
+            <div class="logo-section">
+                <div class="logo">⚡🔌</div>
+                <div class="logo-text">CHARGE BOT</div>
+                <div class="logo-subtitle"> AI Assistant</div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="option-tabs">
+                <button class="option-btn active" onclick="switchAuthOption('phone')">📱 Welcome</button>
+                
+            </div>
+
+            <!-- Phone Option -->
+            <div class="form-section active" id="phoneForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="phone_username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label>Car Brand</label>
+                    <select id="phone_brand">
+                        <option value="">Select Brand</option>
+                        <option value="Tesla">Tesla</option>
+                        <option value="Hyundai">Hyundai Kona Electric</option>
+                        <option value="MG">MG ZS EV</option>
+                        <option value="Tata">Tata Nexon EV</option>
+                        <option value="Mahindra">Mahindra XUV400</option>
+                        <option value="BMW">BMW i3</option>
+                        <option value="Audi">Audi e-tron</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Car Model</label>
+                    <input type="text" id="phone_model" placeholder="e.g., Model 3, Nexon EV Prime">
+                </div>
+                <div class="form-group">
+                    <label>Country Code & Phone Number</label>
+                    <input type="tel" id="phone_number" placeholder="+91 9876543210">
+                </div>
+            </div>
+
+            <!-- Email Option -->
+           
+            <!-- CAPTCHA -->
+            <div class="captcha-container">
+                <label style="font-size: 12px; font-weight: 600; margin-bottom: 10px; display: block;">Verify you're human</label>
+                <div class="captcha-box" id="captchaBox">8K4M2J</div>
+                <input type="text" class="captcha-input" id="captchaInput" placeholder="Enter text shown above">
+                <button class="refresh-captcha" onclick="generateCaptcha()">🔄 Refresh CAPTCHA</button>
+            </div>
+
+            <button class="btn btn-primary" onclick="handleLogin()">Login / Register</button>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center;">
+                <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 10px;">Demo Accounts:</p>
+                <p style="color: var(--text-muted); font-size: 11px; line-height: 1.6;">
+                    <strong>Owner:</strong> admin / 12345<br>
+                    <strong>User:</strong> User / 12345
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div class="app-container" id="appPage">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-logo">
+                <span style="font-size: 28px;">⚡</span>
+                <div class="header-title">CHARGE BOT</div>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                    <span id="themeText">Dark</span>
+                </button>
+                <div class="user-info">
+                    <div class="user-detail">
+                        <div class="name" id="headerUsername"> An </div>
+                        <div class="role" id="headerRole">EV Owner</div>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs" id="tabsContainer">
+            <button class="tab-btn active" onclick="switchTab('client')">💬 Client Assistant</button>
+            <button class="tab-btn" onclick="switchTab('executive')">📸 Executive Section</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- CLIENT SECTION -->
+            <div class="tab-content active" id="clientTab">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h3>⚡ Charging Assistant</h3>
+                        <p>Ask questions about your EV charging experience</p>
+                        <div class="faq-quick-buttons" id="faqButtons"></div>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages"></div>
+
+                    <div class="chat-input-area">
+                        <input 
+                            type="text" 
+                            class="chat-input" 
+                            id="chatInput" 
+                            placeholder="Ask about charging, battery, safety..." 
+                            onkeypress="handleChatKeyPress(event)"
+                        >
+                        <button class="send-btn" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+
+                <!-- Charging History Sidebar -->
+                <div style="width: 350px; display: flex; flex-direction: column; gap: 20px;">
+                    <div style="background: var(--dark-card); border: 2px solid var(--border-color); border-radius: 15px; padding: 20px; flex: 1; transition: all 0.4s ease;">
+                        <h3 style="margin-bottom: 15px; font-size: 16px;">📊 Your Charging History</h3>
+                        <div class="history-container" id="historyContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXECUTIVE SECTION -->
+            <div class="tab-content" id="executiveTab">
+                <!-- Owner Dashboard -->
+                <div id="ownerDashboard" style="display: none; width: 100%; overflow-y: auto;">
+                    <div class="owner-dashboard">
+                        <h2 style="font-size: 22px; margin-bottom: 20px;">📊 Owner Dashboard</h2>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Users</div>
+                                <div class="stat-number" id="totalUsers">3</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Total Sessions</div>
+                                <div class="stat-number" id="totalSessions">12</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Energy Delivered</div>
+                                <div class="stat-number" id="totalEnergy">156</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 5px;">kWh</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 30px;">
+                            <h3 style="margin-bottom: 15px; font-size: 16px;">👥 All Users & Sessions</h3>
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Car</th>
+                                        <th>Sessions</th>
+                                        <th>Energy (kWh)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Executive/User Photo Upload -->
+                <div id="executiveUpload" style="width: 100%;">
+                    <div class="executive-container" style="grid-template-columns: 1fr;">
+                        <div class="exec-section">
+                            <h2 style="font-size: 22px; margin-bottom: 20px;">📸 Charger Session Documentation</h2>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <!-- Before Charging -->
+                                <div>
+                                    <div class="exec-title">Before Charging</div>
+                                    <div 
+                                        class="upload-area" 
+                                        id="beforeUploadArea"
+                                        ondrop="handleDrop(event, 'before')"
+                                        ondragover="handleDragOver(event)"
+                                        ondragleave="handleDragLeave(event)"
+                                        onclick="document.getElementById('beforeInput').click()"
+                                    >
+                                        <div class="upload-icon">📷</div>
+                                        <div class="upload-text">
+                                            Click or drag photo here<br>
+                                            <strong>Before Charging</strong>
+                                        </div>
+                                        <input type="file" id="beforeInput" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'before')">
+                                    </div>
+                                    <div class="image-preview" id="beforePreview"></div>
+                                </div>
+
+                                <!-- After Charging -->
+                                <div>
+                                    <div class="exec-title">After Charging</div>
+                                    <div 
+                                        class="upload-area" 
+                                        id="afterUploadArea"
+                                        ondrop="handleDrop(event, 'after')"
+                                        ondragover="handleDragOver(event)"
+                                        ondragleave="handleDragLeave(event)"
+                                        onclick="document.getElementById('afterInput').click()"
+                                    >
+                                        <div class="upload-icon">📸</div>
+                                        <div class="upload-text">
+                                            Click or drag photo here<br>
+                                            <strong>After Charging</strong>
+                                        </div>
+                                        <input type="file" id="afterInput" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'after')">
+                                    </div>
+                                    <div class="image-preview" id="afterPreview"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-inputs" style="margin-top: 20px;">
+                                <input type="text" id="chargerID" placeholder="Charger ID">
+                                <input type="text" id="location" placeholder="Charging Location">
+                                <input type="number" id="energyDelivered" placeholder="Energy Delivered (kWh)" step="0.1">
+                                <textarea id="sessionNotes" placeholder="Session Notes (optional)"></textarea>
+                                <button class="submit-btn" onclick="submitChargerSession()">Submit Session</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== DATA MANAGEMENT =====
+        const faqData = [
+            {
+                q: "My charging session is not starting. What should I do?",
+                a: "Ensure your vehicle is properly connected to the charging connector.\n\nVerify that the charging session has been initiated from the app.\n\nCheck if the charger is online and receiving power.\n\nRestart the charging session from the app.\n\nIf the issue persists, contact support and share the charger ID and error message."
+            },
+            {
+                q: "Why is my vehicle charging slower than expected?",
+                a: "Charging speed may vary due to:\n\n• Battery charge level (charging slows after 80%)\n• Battery temperature\n• Vehicle charging capacity\n• Power availability at the charging location\n• Network load and charger utilization\n\nFor optimal charging speed, ensure the vehicle battery is within the recommended temperature range."
+            },
+            {
+                q: "My charging session stopped unexpectedly. What should I do?",
+                a: "Check whether the charging connector is securely attached.\n\nVerify that there is no power interruption at the charging location.\n\nReview any error notifications in the app.\n\nRestart the charging session.\n\nIf the problem continues, raise a support ticket through the app."
+            },
+            {
+                q: "How can I track the status of my charging session?",
+                a: "You can monitor:\n\n• Current charging status\n• Energy delivered (kWh)\n• Estimated completion time\n• Charging duration\n\nAll information is available in the mobile application under Active Sessions."
+            },
+            {
+                q: "How do I report a faulty charger?",
+                a: "Open the  application.\n\nNavigate to Support.\n\nSelect Report an Issue.\n\nEnter the charger ID and upload photos if available.\n\nSubmit the report.\n\nOur support team will review the issue and assign a technician if required."
+            },
+            {
+                q: "What should I do if the charging connector is damaged?",
+                a: "Do not attempt to use the charger.\n\nStop the charging session immediately.\n\nCapture photos of the damaged connector.\n\nReport the issue through the support section of the app.\n\nWait for inspection by an authorized technician."
+            },
+            {
+                q: "How do I schedule a charging service?",
+                a: "Open the application.\n\nSelect Schedule Charging.\n\nChoose your location.\n\nSelect a preferred date and time.\n\nConfirm the booking.\n\nYou will receive a confirmation notification once the request is processed."
+            },
+            {
+                q: "What payment methods are supported?",
+                a: " Supports:\n\n• UPI\n• Credit Cards\n• Debit Cards\n• Net Banking\n• Digital Wallets\n\nPayment options may vary based on location and service availability."
+            },
+            {
+                q: "How can I view my charging history?",
+                a: "Open the  application.\n\nGo to My Account.\n\nSelect Charging History.\n\nYou can view:\n• Date and time\n• Energy consumed\n• Charging duration\n• Payment details"
+            },
+            {
+                q: "How does  ensure safe charging? ⭐",
+                a: "It follows multiple safety measures:\n\n• Continuous charger health monitoring\n• Automatic fault detection\n• Temperature monitoring\n• Overcurrent and overvoltage protection\n• Certified charging equipment and safety protocols\n\nIf any abnormal condition is detected, the charging session may automatically stop to protect the vehicle and charging equipment."
+            }
+        ];
+
+        // Mock Data
+        const mockUsers = {
+            "admin": { password: "12345", name: "Admin Owner", role: "owner", brand: "Tesla", model: "Model S", contact: "+91 9999999999" },
+            "john": { password: "12345", name: "John Doe", role: "user", brand: "Tata", model: "Nexon EV", contact: "+91 9876543210" },
+            "sarah": { password: "12345", name: "Sarah Smith", role: "user", brand: "Hyundai", model: "Kona Electric", contact: "+91 9876543211" },
+            "mike": { password: "12345", name: "Mike Johnson", role: "user", brand: "MG", model: "ZS EV", contact: "+91 9876543212" }
+        };
+
+        let currentUser = null;
+        let captchaAnswer = "";
+        let chargerSessions = JSON.parse(localStorage.getItem("chargerSessions")) || [];
+        let userChats = JSON.parse(localStorage.getItem("userChats")) || {};
+        let userChargingHistory = JSON.parse(localStorage.getItem("userChargingHistory")) || {};
+        let currentTheme = localStorage.getItem("theme") || "dark";
+
+        // Initialize
+        generateCaptcha();
+        loadFAQButtons();
+        applyTheme(currentTheme);
+
+        // ===== THEME MANAGEMENT =====
+        function toggleTheme() {
+            currentTheme = currentTheme === "dark" ? "light" : "dark";
+            localStorage.setItem("theme", currentTheme);
+            applyTheme(currentTheme);
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const appContainer = document.getElementById("appPage");
+            const themeIcon = document.getElementById("themeIcon");
+            const themeText = document.getElementById("themeText");
+
+            if (theme === "light") {
+                body.classList.add("light-theme");
+                appContainer.classList.add("light-theme");
+                themeIcon.textContent = "☀️";
+                themeText.textContent = "Light";
+            } else {
+                body.classList.remove("light-theme");
+                appContainer.classList.remove("light-theme");
+                themeIcon.textContent = "🌙";
+                themeText.textContent = "Dark";
+            }
+        }
+
+        // ===== AUTHENTICATION =====
+        function switchAuthOption(option) {
+            document.querySelectorAll(".form-section").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".option-btn").forEach(el => el.classList.remove("active"));
+
+            if (option === "phone") {
+                document.getElementById("phoneForm").classList.add("active");
+                document.querySelector('[onclick="switchAuthOption(\'phone\')"]').classList.add("active");
+            } else {
+                document.getElementById("emailForm").classList.add("active");
+                document.querySelector('[onclick="switchAuthOption(\'email\')"]').classList.add("active");
+            }
+        }
+
+        function generateCaptcha() {
+            const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+            captchaAnswer = "";
+            for (let i = 0; i < 6; i++) {
+                captchaAnswer += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById("captchaBox").textContent = captchaAnswer;
+            document.getElementById("captchaInput").value = "";
+        }
+
+        function handleLogin() {
+            const errorMsg = document.getElementById("errorMessage");
+            errorMsg.classList.remove("show");
+
+            const captchaInput = document.getElementById("captchaInput").value.toUpperCase();
+            if (captchaInput !== captchaAnswer) {
+                showError("Incorrect CAPTCHA. Try again!");
+                return;
+            }
+
+            let username = "", brand = "", model = "", contact = "";
+
+            const phoneFormActive = document.getElementById("phoneForm").classList.contains("active");
+            
+            if (phoneFormActive) {
+                username = document.getElementById("phone_username").value;
+                brand = document.getElementById("phone_brand").value;
+                model = document.getElementById("phone_model").value;
+                contact = document.getElementById("phone_number").value;
+            } else {
+                username = document.getElementById("email_username").value;
+                brand = document.getElementById("email_brand").value;
+                model = document.getElementById("email_model").value;
+                contact = document.getElementById("email_email").value;
+            }
+
+            if (!username || !brand || !model || !contact) {
+                showError("Please fill all fields!");
+                return;
+            }
+
+            // Check if user exists in mock data
+            if (mockUsers[username] && mockUsers[username].password === "12345") {
+                loginUser(username, mockUsers[username], brand, model, contact);
+            } else {
+                // Create new user
+                mockUsers[username] = {
+                    password: "12345",
+                    name: username.charAt(0).toUpperCase() + username.slice(1),
+                    role: "user",
+                    brand: brand,
+                    model: model,
+                    contact: contact
+                };
+                loginUser(username, mockUsers[username], brand, model, contact);
+            }
+        }
+
+        function loginUser(username, userData, brand, model, contact) {
+            currentUser = {
+                username: username,
+                name: userData.name,
+                role: userData.role,
+                brand: brand || userData.brand,
+                model: model || userData.model,
+                contact: contact || userData.contact
+            };
+
+            // Initialize user data
+            if (!userChats[username]) userChats[username] = [];
+            if (!userChargingHistory[username]) userChargingHistory[username] = [];
+
+            localStorage.setItem("chargerSessions", JSON.stringify(chargerSessions));
+            localStorage.setItem("userChats", JSON.stringify(userChats));
+            localStorage.setItem("userChargingHistory", JSON.stringify(userChargingHistory));
+
+            showApp();
+        }
+
+        function showError(msg) {
+            const errorMsg = document.getElementById("errorMessage");
+            errorMsg.textContent = "❌ " + msg;
+            errorMsg.classList.add("show");
+        }
+
+        // ===== APP FUNCTIONS =====
+        function showApp() {
+            document.getElementById("authPage").style.display = "none";
+            document.getElementById("appPage").classList.add("active");
+            
+            document.getElementById("headerUsername").textContent = currentUser.name;
+            document.getElementById("headerRole").textContent = currentUser.role === "owner" ? "Owner" : currentUser.brand + " " + currentUser.model;
+
+            if (currentUser.role === "owner") {
+                document.getElementById("ownerDashboard").style.display = "block";
+                document.getElementById("executiveUpload").style.display = "none";
+                loadOwnerDashboard();
+            } else {
+                document.getElementById("ownerDashboard").style.display = "none";
+                document.getElementById("executiveUpload").style.display = "block";
+            }
+
+            loadUserChat();
+            loadUserHistory();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById("appPage").classList.remove("active");
+            document.getElementById("authPage").style.display = "flex";
+            document.getElementById("chatMessages").innerHTML = "";
+            document.getElementById("chargerID").value = "";
+            document.getElementById("location").value = "";
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add("active");
+            document.getElementById(tab + "Tab").classList.add("active");
+
+            if (tab === "client") {
+                loadUserHistory();
+            }
+        }
+
+        // ===== CHAT FUNCTIONS =====
+        function loadFAQButtons() {
+            const container = document.getElementById("faqButtons");
+            faqData.forEach((item, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "faq-btn";
+                btn.textContent = item.q.substring(0, 45) + "...";
+                btn.onclick = () => askFAQ(item.q);
+                container.appendChild(btn);
+            });
+        }
+
+        function loadUserChat() {
+            const messages = userChats[currentUser.username] || [];
+            document.getElementById("chatMessages").innerHTML = "";
+            messages.forEach(msg => {
+                const div = document.createElement("div");
+                div.className = "message " + msg.type;
+                const content = document.createElement("div");
+                content.className = "message-content";
+                content.textContent = msg.text;
+                div.appendChild(content);
+                document.getElementById("chatMessages").appendChild(div);
+            });
+            scrollChatToBottom();
+        }
+
+        function askFAQ(question) {
+            document.getElementById("chatInput").value = question;
+            sendMessage();
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === "Enter") sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById("chatInput");
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, "user");
+            input.value = "";
+
+            // Find matching FAQ
+            const matching = faqData.find(item => 
+                item.q.toLowerCase().includes(message.toLowerCase()) ||
+                message.toLowerCase().includes(item.q.toLowerCase().substring(0, 20))
+            );
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            setTimeout(() => {
+                removeTypingIndicator();
+                if (matching) {
+                    addMessage(matching.a, "bot");
+                } else {
+                    addMessage("I couldn't find the exact answer to your question. For further assistance please contact xxxxxxxxxx", "bot");
+                }
+            }, 1000);
+        }
+
+        function addMessage(text, type) {
+            const messagesDiv = document.getElementById("chatMessages");
+            const div = document.createElement("div");
+            div.className = "message " + type;
+            const content = document.createElement("div");
+            content.className = "message-content";
+            content.textContent = text;
+            div.appendChild(content);
+            messagesDiv.appendChild(div);
+
+            // Save to localStorage
+            if (!userChats[currentUser.username]) userChats[currentUser.username] = [];
+            userChats[currentUser.username].push({ type: type, text: text });
+            localStorage.setItem("userChats", JSON.stringify(userChats));
+
+            scrollChatToBottom();
+        }
+
+        function showTypingIndicator() {
+            const div = document.createElement("div");
+            div.className = "message bot";
+            div.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+            div.id = "typingIndicator";
+            document.getElementById("chatMessages").appendChild(div);
+            scrollChatToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById("typingIndicator");
+            if (indicator) indicator.remove();
+        }
+
+        function scrollChatToBottom() {
+            const messagesDiv = document.getElementById("chatMessages");
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // ===== CHARGING HISTORY =====
+        function loadUserHistory() {
+            const container = document.getElementById("historyContainer");
+            const username = currentUser.username;
+            const history = userChargingHistory[username] || [];
+
+            if (history.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No charging history yet</p>';
+                return;
+            }
+
+            container.innerHTML = "";
+            history.forEach((session, idx) => {
+                const card = document.createElement("div");
+                card.className = "history-card";
+                card.innerHTML = `
+                    <div class="history-card-title">Session #${history.length - idx}</div>
+                    <div class="history-card-detail">
+                        <span>📍 <strong>Location:</strong> <span>${session.location}</span></span>
+                        <span>⚡ <strong>Energy:</strong> <span>${session.energy}kWh</span></span>
+                        <span>🕐 <strong>Duration:</strong> <span>${session.duration}h</span></span>
+                        <span>💰 <strong>Cost:</strong> <span>₹${session.cost}</span></span>
+                        <span>📅 <strong>Date:</strong> <span>${session.date}</span></span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ===== EXECUTIVE SECTION =====
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add("drag-over");
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove("drag-over");
+        }
+
+        function handleDrop(e, type) {
+            e.preventDefault();
+            e.currentTarget.classList.remove("drag-over");
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFileSelect({target: {files: files}}, type);
+        }
+
+        function handleFileSelect(event, type) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            const file = files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                showToast("File size exceeds 5MB", "error");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                displayPreview(base64, type);
+                showToast("Photo uploaded successfully!", "success");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayPreview(base64, type) {
+            const previewDiv = document.getElementById(type + "Preview");
+            const item = document.createElement("div");
+            item.className = "preview-item";
+            item.innerHTML = `
+                <img src="${base64}" alt="Preview">
+                <button class="preview-remove" onclick="this.parentElement.remove()">×</button>
+            `;
+            item.dataset.base64 = base64;
+            previewDiv.innerHTML = "";
+            previewDiv.appendChild(item);
+        }
+
+        function submitChargerSession() {
+            const beforePhotos = document.getElementById("beforePreview").querySelectorAll("img");
+            const afterPhotos = document.getElementById("afterPreview").querySelectorAll("img");
+            const chargerID = document.getElementById("chargerID").value;
+            const location = document.getElementById("location").value;
+            const energy = parseFloat(document.getElementById("energyDelivered").value);
+            const notes = document.getElementById("sessionNotes").value;
+
+            if (!chargerID || !location || !energy || beforePhotos.length === 0 || afterPhotos.length === 0) {
+                showToast("Please fill all fields and upload photos", "error");
+                return;
+            }
+
+            const session = {
+                username: currentUser.username,
+                chargerID: chargerID,
+                location: location,
+                energy: energy,
+                notes: notes,
+                beforePhoto: beforePhotos[0].src,
+                afterPhoto: afterPhotos[0].src,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString()
+            };
+
+            chargerSessions.push(session);
+            localStorage.setItem("chargerSessions", JSON.stringify(chargerSessions));
+
+            // Add to user's charging history
+            if (!userChargingHistory[currentUser.username]) userChargingHistory[currentUser.username] = [];
+            userChargingHistory[currentUser.username].unshift({
+                location: location,
+                energy: energy,
+                duration: Math.round(energy / 7), // Estimated
+                cost: Math.round(energy * 8),
+                date: new Date().toLocaleDateString()
+            });
+            localStorage.setItem("userChargingHistory", JSON.stringify(userChargingHistory));
+
+            showToast("✅ Charging session submitted successfully!", "success");
+            document.getElementById("chargerID").value = "";
+            document.getElementById("location").value = "";
+            document.getElementById("energyDelivered").value = "";
+            document.getElementById("sessionNotes").value = "";
+            document.getElementById("beforePreview").innerHTML = "";
+            document.getElementById("afterPreview").innerHTML = "";
+        }
+
+        // ===== OWNER DASHBOARD =====
+        function loadOwnerDashboard() {
+            const allSessions = chargerSessions;
+            const usernames = Object.keys(mockUsers).filter(u => mockUsers[u].role === "user");
+
+            document.getElementById("totalUsers").textContent = usernames.length;
+            document.getElementById("totalSessions").textContent = allSessions.length;
+
+            let totalEnergy = 0;
+            allSessions.forEach(s => totalEnergy += s.energy);
+            document.getElementById("totalEnergy").textContent = totalEnergy;
+
+            const tbody = document.getElementById("usersTableBody");
+            tbody.innerHTML = "";
+
+            usernames.forEach(username => {
+                const userSessions = allSessions.filter(s => s.username === username);
+                const totalEnergy = userSessions.reduce((sum, s) => sum + s.energy, 0);
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${mockUsers[username].name}</td>
+                    <td>${mockUsers[username].brand} ${mockUsers[username].model}</td>
+                    <td>${userSessions.length}</td>
+                    <td>${totalEnergy}</td>
+                    <td><button class="view-btn" onclick="viewUserDetails('${username}')">View Details</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function viewUserDetails(username) {
+            alert(`User: ${mockUsers[username].name}\nCar: ${mockUsers[username].brand} ${mockUsers[username].model}\nContact: ${mockUsers[username].contact}\n\nSessions: ${chargerSessions.filter(s => s.username === username).length}`);
+        }
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(message, type = "success") {
+            const toast = document.createElement("div");
+            toast.className = "toast " + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
