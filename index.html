@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hopcharge AI Assistant</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="assistant-avatar">
+            ⚡
+        </div>
+
+        <div>
+            <h1>Hopcharge AI Assistant</h1>
+            <p class="status">● Online</p>
+        </div>
+
+    </div>
+    <div class="tabs">
+
+        <button
+            class="tab-btn active"
+            onclick="showTab('customerTab', this)">
+            Customer Support
+        </button>
+    
+        <button
+            class="tab-btn"
+            onclick="showTab('executiveTab', this)">
+            Executive Panel
+        </button>
+    
+    </div>
+    
+    <div id="customerTab">
+    <div class="suggestions">
+
+        <button onclick="fillQuestion('When will my charging be initiated?')">
+            Charging Status
+        </button>
+
+        <button onclick="fillQuestion('My charging session stopped automatically')">
+            Charging Stopped
+        </button>
+
+        <button onclick="fillQuestion('My battery is draining very fast')">
+            Battery Drain
+        </button>
+
+        <button onclick="fillQuestion('How healthy is my battery?')">
+            Battery Health
+        </button>
+
+    </div>
+
+    <div id="chatContainer" class="chat-container">
+
+        <div class="bot-message">
+
+            👋 Welcome to Hopcharge.
+
+            <br><br>
+
+            I can assist you with:
+
+            <ul>
+                <li>Charging Status</li>
+                <li>Battery Diagnostics</li>
+                <li>Vehicle Health</li>
+                <li>Executive Tracking</li>
+                <li>Technical Troubleshooting</li>
+            </ul>
+
+        </div>
+
+    </div>
+
+    <div class="photo-section">
+
+        <div class="photo-card">
+    
+            <h3>📷 Before Charging Photo</h3>
+    
+            <input
+                type="file"
+                id="beforePhoto"
+                accept="image/*"
+                capture="environment"
+            >
+    
+            <img
+                id="beforePreview"
+                class="photo-preview"
+            >
+    
+        </div>
+    
+        <div class="photo-card">
+    
+            <h3>📷 After Charging Photo</h3>
+    
+            <input
+                type="file"
+                id="afterPhoto"
+                accept="image/*"
+                capture="environment"
+            >
+    
+            <img
+                id="afterPreview"
+                class="photo-preview"
+            >
+    
+        </div>
+    
+    </div>
+    <div class="input-section">
+
+        <input
+            type="text"
+            id="userInput"
+            placeholder="Ask your question..."
+        >
+
+        <button onclick="sendMessage()">
+            Send
+        </button>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</div>
+<div id="executiveTab" style="display:none;">
+
+    <div class="executive-panel">
+
+        <h2>🚗 Executive Operations Panel</h2>
+
+        <div class="job-card">
+
+            <p><strong>Booking ID:</strong> HC-2026-001</p>
+            <p><strong>Customer:</strong> Rahul Sharma</p>
+            <p><strong>Status:</strong> Charging In Progress</p>
+
+        </div>
+
+        <div class="photo-section">
+
+            <div class="photo-card">
+
+                <h3>📷 Before Charging Photo</h3>
+
+                <input
+                    type="file"
+                    id="beforePhoto"
+                    accept="image/*"
+                    capture="environment"
+                >
+
+                <img
+                    id="beforePreview"
+                    class="photo-preview"
+                >
+
+            </div>
+
+            <div class="photo-card">
+
+                <h3>📷 After Charging Photo</h3>
+
+                <input
+                    type="file"
+                    id="afterPhoto"
+                    accept="image/*"
+                    capture="environment"
+                >
+
+                <img
+                    id="afterPreview"
+                    class="photo-preview"
+                >
+
+            </div>
+
+        </div>
+
+        <div class="feedback-section">
+
+            <h3>⭐ Customer Feedback</h3>
+
+            <select>
+                <option>1 Star</option>
+                <option>2 Star</option>
+                <option>3 Star</option>
+                <option>4 Star</option>
+                <option selected>5 Star</option>
+            </select>
+
+        </div>
+
+        <div class="notes-section">
+
+            <h3>📝 Executive Notes</h3>
+
+            <textarea
+                placeholder="Enter service notes..."
+            ></textarea>
+
+        </div>
+
+        <button class="submit-job-btn">
+            Submit Job
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+</html>
